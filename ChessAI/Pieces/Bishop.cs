@@ -50,12 +50,16 @@ namespace ChessAI.Pieces
             Point nextPosition;
             ConflictType conflict;
 
-            while (OperatorOverloading.Comparer(incrementX, currentPosition.X)
-                && OperatorOverloading.Comparer(incrementY, currentPosition.Y))
+            while (true)
             {
                 nextPosition = new Point(
                     currentPosition.X + incrementX,
                     currentPosition.Y + incrementY);
+
+                if (!OperatorOverloading.IsPositionOnBoard(nextPosition))
+                {
+                    return;
+                }
 
                 conflict = Board.CheckConflict(this, nextPosition);
                 if (conflict == ConflictType.Ally)

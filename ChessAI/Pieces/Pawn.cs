@@ -77,7 +77,7 @@ namespace ChessAI.Pieces
 
         private void EnPassant(ref List<Point> list, Point currentPosition, bool isWhite)
         {
-            //check if previous move was double step and pawn arrived next to use...then check for conflicts etc
+            //check if previous move was double step and pawn has arrived next to us...then check for conflicts etc
         }
     }
 }

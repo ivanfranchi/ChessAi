@@ -35,13 +35,13 @@ namespace ChessAI
                     stringedPiece = pieces[j, i];
                     if (stringedPiece == null)
                     {
-                        stringedBoard += " ";
+                        stringedBoard += "  ";
                     }
                     else
                     {
                         stringedBoard += stringedPiece;
                     }
-                    stringedBoard += " ";
+                    stringedBoard += "  ";
                 }
                 stringedBoard += Environment.NewLine;
             }

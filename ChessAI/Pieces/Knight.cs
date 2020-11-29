@@ -70,6 +70,11 @@ namespace ChessAI.Pieces
                 currentPosition.X + incrementX,
                 currentPosition.Y + incrementY);
 
+            if (!OperatorOverloading.IsPositionOnBoard(nextPosition))
+            {
+                return;
+            }
+
             conflict = Board.CheckConflict(this, nextPosition);
             if (conflict == ConflictType.Enemy)
             {

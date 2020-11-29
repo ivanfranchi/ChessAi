@@ -10,7 +10,7 @@ namespace ChessAI
     public class Board
     {
         static List<Piece> pieces;
-        Dictionary<Piece, List<Point>> moves = new Dictionary<Piece, List<Point>>();
+        Dictionary<Piece, List<Point>> moves;
 
         public Board()
         {
@@ -60,6 +60,8 @@ namespace ChessAI
 
         public Dictionary<Piece, List<Point>> GetMoves()
         {
+            moves = new Dictionary<Piece, List<Point>>();
+
             foreach (var piece in pieces)
             {
                 moves.Add(piece, piece.GetLegalMoves());
@@ -109,10 +111,10 @@ namespace ChessAI
             pieces.Add(new Knight(true, new Point(6, 0)));
             pieces.Add(new Rook(true, new Point(7, 0), false));
 
-            //pieces.Add(new Pawn(true, new Point(0, 1)));
-            //pieces.Add(new Pawn(true, new Point(1, 1)));
+            pieces.Add(new Pawn(true, new Point(0, 1)));
+            pieces.Add(new Pawn(true, new Point(1, 1)));
             pieces.Add(new Pawn(true, new Point(2, 1)));
-            //pieces.Add(new Pawn(true, new Point(3, 1)));
+            pieces.Add(new Pawn(true, new Point(3, 1)));
             pieces.Add(new Pawn(true, new Point(4, 1)));
             pieces.Add(new Pawn(true, new Point(5, 1)));
             pieces.Add(new Pawn(true, new Point(6, 1)));
