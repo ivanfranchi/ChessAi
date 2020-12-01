@@ -55,6 +55,11 @@ namespace ChessAI.Pieces
                     Score = 1;
                     break;
             }
+
+            if (!IsWhite)
+            {
+                Score *= -1;
+            }
         }
     }
 }

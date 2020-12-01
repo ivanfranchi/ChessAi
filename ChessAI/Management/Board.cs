@@ -5,16 +5,21 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace ChessAI
+namespace ChessAI.Management
 {
     public class Board
     {
+        public bool isWhiteTurn = true;
         static List<Piece> pieces;
+        int movesCounter = 0;
         Dictionary<Piece, List<Point>> moves;
+        Dictionary<Piece, List<Point>> pastMoves; //history management
 
         public Board()
         {
             FillStartingBoard();
+
+            pastMoves = new Dictionary<Piece, List<Point>>();
         }
 
         /// <summary>
@@ -24,21 +29,33 @@ namespace ChessAI
         /// <param name="toPosition">The arrival position</param>
         public void Move(Point fromPosition, Point toPosition)
         {
+            //check if piece to move exists
             var pieceToMove = pieces.SingleOrDefault(atPosition => atPosition.Position == fromPosition);
             if (pieceToMove == null)
             {
-                throw new Exception("No piece at starting position");
+                throw new Exception("No piece at starting position.");
             }
 
+            //check if piece has legal moves
+            if(!moves.TryGetValue(pieceToMove, out var legalMoves) || legalMoves.Count == 0)
+            {
+                throw new Exception("No legal moves for piece.");
+            }
+
+            //check if the move we are asking exists in the list of legal moves
+            var move = legalMoves.GetMoveByCoordinates(toPosition);
+
             //remove if something at arrival position
-            var pieceToRemove = GetPieceByPosition(toPosition);
+            var pieceToRemove = pieces.GetPieceByPosition(toPosition);
             if (pieceToRemove != null)
             {
                 pieces.Remove(pieceToRemove);
             }
 
-            //update piece position
+            //update piece current position
             pieceToMove.Position = toPosition;
+
+            movesCounter++;
         }
 
         /// <summary>
@@ -52,35 +69,53 @@ namespace ChessAI
             foreach (var piece in pieces)
             {
                 position = piece.Position;
-                board[position.X, position.Y] = piece.Name;
+                board[position.X, position.Y] = GetCasedName(piece);
             }
 
             return board;
         }
 
-        public Dictionary<Piece, List<Point>> GetMoves()
+        public int GetMovesCounter()
+        {
+            return movesCounter;
+        }
+
+        public Dictionary<Piece, List<Point>> GetMoves(bool color)
         {
             moves = new Dictionary<Piece, List<Point>>();
 
             foreach (var piece in pieces)
             {
-                moves.Add(piece, piece.GetLegalMoves());
+                if(piece.IsWhite == color)
+                {
+                    moves.Add(piece, piece.GetLegalMoves());
+                }
             }
 
             return moves;
         }
 
+        public double EvaluateBoard()
+        {
+            var score = 0.0;
 
+            foreach (var piece in pieces)
+            {
+                score += piece.Score;
+            }
+
+            return score;
+        }
 
         /// <summary>
-        /// Ch
+        /// Check what is in place at the arriving position
         /// </summary>
-        /// <param name="piece"></param>
-        /// <param name="nextPosition"></param>
-        /// <returns></returns>
-        public static ConflictType CheckConflict(Piece piece, Point nextPosition)
+        /// <param name="piece">piece getting moved</param>
+        /// <param name="arrivingPosition">arriving position to test</param>
+        /// <returns>Conflict type. What we find at arrival position</returns>
+        public static ConflictType CheckConflict(Piece piece, Point arrivingPosition)
         {
-            var pieceInNextPosition = GetPieceByPosition(nextPosition);
+            var pieceInNextPosition = pieces.GetPieceByPosition(arrivingPosition);
             if (pieceInNextPosition == null)
             {
                 return ConflictType.None;
@@ -143,9 +178,21 @@ namespace ChessAI
             //pieces.Add(new Pawn(true, new Point(4, 4)));
         }
 
-        private static Piece GetPieceByPosition(Point position)
+        /// <summary>
+        /// Upper case for whites and lower case for blacks
+        /// </summary>
+        /// <param name="piece">Piece to get the name from</param>
+        /// <returns>Name of the piece distinguishing black and white</returns>
+        private string GetCasedName(Piece piece)
         {
-            return pieces.SingleOrDefault(atPosition => atPosition.Position == position);
+            if (piece.IsWhite)
+            {
+                return piece.Name;
+            }
+            else
+            {
+                return piece.Name.ToLower();
+            }
         }
     }
 }

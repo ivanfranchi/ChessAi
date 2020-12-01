@@ -34,6 +34,10 @@ namespace ChessAI
             this.txtMove = new System.Windows.Forms.TextBox();
             this.btnMove = new System.Windows.Forms.Button();
             this.lblError = new System.Windows.Forms.Label();
+            this.lblScoreText = new System.Windows.Forms.Label();
+            this.lblScore = new System.Windows.Forms.Label();
+            this.lblMovesCounter = new System.Windows.Forms.Label();
+            this.lblMovesText = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnPopulate
@@ -42,7 +46,7 @@ namespace ChessAI
             this.btnPopulate.Name = "btnPopulate";
             this.btnPopulate.Size = new System.Drawing.Size(75, 23);
             this.btnPopulate.TabIndex = 0;
-            this.btnPopulate.Text = "Populate";
+            this.btnPopulate.Text = "Start";
             this.btnPopulate.UseVisualStyleBackColor = true;
             this.btnPopulate.Click += new System.EventHandler(this.btnPopulate_Click);
             // 
@@ -80,11 +84,50 @@ namespace ChessAI
             this.lblError.Size = new System.Drawing.Size(0, 13);
             this.lblError.TabIndex = 4;
             // 
+            // lblScoreText
+            // 
+            this.lblScoreText.AutoSize = true;
+            this.lblScoreText.Location = new System.Drawing.Point(377, 92);
+            this.lblScoreText.Name = "lblScoreText";
+            this.lblScoreText.Size = new System.Drawing.Size(38, 13);
+            this.lblScoreText.TabIndex = 5;
+            this.lblScoreText.Text = "Score:";
+            // 
+            // lblScore
+            // 
+            this.lblScore.AutoSize = true;
+            this.lblScore.Location = new System.Drawing.Point(422, 92);
+            this.lblScore.Name = "lblScore";
+            this.lblScore.Size = new System.Drawing.Size(0, 13);
+            this.lblScore.TabIndex = 6;
+            // 
+            // lblMovesCounter
+            // 
+            this.lblMovesCounter.AutoSize = true;
+            this.lblMovesCounter.Location = new System.Drawing.Point(422, 114);
+            this.lblMovesCounter.Name = "lblMovesCounter";
+            this.lblMovesCounter.Size = new System.Drawing.Size(13, 13);
+            this.lblMovesCounter.TabIndex = 8;
+            this.lblMovesCounter.Text = "0";
+            // 
+            // lblMovesText
+            // 
+            this.lblMovesText.AutoSize = true;
+            this.lblMovesText.Location = new System.Drawing.Point(377, 114);
+            this.lblMovesText.Name = "lblMovesText";
+            this.lblMovesText.Size = new System.Drawing.Size(42, 13);
+            this.lblMovesText.TabIndex = 7;
+            this.lblMovesText.Text = "Moves:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.lblMovesCounter);
+            this.Controls.Add(this.lblMovesText);
+            this.Controls.Add(this.lblScore);
+            this.Controls.Add(this.lblScoreText);
             this.Controls.Add(this.lblError);
             this.Controls.Add(this.btnMove);
             this.Controls.Add(this.txtMove);
@@ -104,6 +147,10 @@ namespace ChessAI
         private System.Windows.Forms.TextBox txtMove;
         private System.Windows.Forms.Button btnMove;
         private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Label lblScoreText;
+        private System.Windows.Forms.Label lblScore;
+        private System.Windows.Forms.Label lblMovesCounter;
+        private System.Windows.Forms.Label lblMovesText;
     }
 }
 

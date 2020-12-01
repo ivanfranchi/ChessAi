@@ -1,4 +1,5 @@
 ﻿using ChessAI.Common;
+using ChessAI.Management;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -33,16 +34,16 @@ namespace ChessAI.Pieces
             //right
             EatLeftAndRight(ref list, Position, IsWhite, isEatingLeft: false);
 
-            //enpassant
+            //enpassant TODO
             EnPassant(ref list, Position, IsWhite);
 
             return list;
         }
 
+        //To perform double step check first if step is legal then to step again
         private void OneOrDoubleStep(ref List<Point> list, Point currentPosition, bool isWhite, bool isSingleStep)
         {
-            int step = isSingleStep ? 1 : 2;
-
+            var step = 1;
             if (!isWhite)
             {
                 step *= -1;
@@ -55,7 +56,27 @@ namespace ChessAI.Pieces
             ConflictType conflict = Board.CheckConflict(this, nextPosition);
             if (conflict == ConflictType.None)
             {
-                list.Add(nextPosition);
+                if (isSingleStep)
+                {
+                    if (Promoting(isWhite, nextPosition.Y))
+                    {
+                        return; //stopping atm
+                    }
+
+                    list.Add(nextPosition);
+                }
+                else
+                {
+                    nextPosition = new Point(
+                        currentPosition.X + 0,
+                        currentPosition.Y + step + step);
+
+                    conflict = Board.CheckConflict(this, nextPosition);
+                    if (conflict == ConflictType.None)
+                    {
+                        list.Add(nextPosition);
+                    }
+                }
             }
         }
 
@@ -71,6 +92,11 @@ namespace ChessAI.Pieces
             ConflictType conflict = Board.CheckConflict(this, nextPosition);
             if (conflict == ConflictType.Enemy)
             {
+                //check for promotion...
+                if (Promoting(isWhite, nextPosition.Y))
+                {
+                    return; //stopping atm
+                }
                 list.Add(nextPosition);
             }
         }
@@ -78,6 +104,11 @@ namespace ChessAI.Pieces
         private void EnPassant(ref List<Point> list, Point currentPosition, bool isWhite)
         {
             //check if previous move was double step and pawn has arrived next to us...then check for conflicts etc
+        }
+
+        private bool Promoting(bool isWhite, int nextPositionY)
+        {
+            return isWhite && nextPositionY == 7 || !isWhite && nextPositionY == 0;
         }
     }
 }
