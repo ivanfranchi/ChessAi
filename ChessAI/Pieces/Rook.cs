@@ -9,19 +9,18 @@ namespace ChessAI.Pieces
     {
         public Rook(
             bool isWhite,
-            Point position,
-            bool hasMoved)
+            Point position)
             : base(
                 isWhite,
                 "R",
                 position)
         {
-            HasMoved = hasMoved;
+            HasMoved = false;
         }
 
-        public bool HasMoved { get; }
+        public bool HasMoved { get; set; }
 
-        public override List<Point> GetLegalMoves()
+        public override List<Point> GetLegalMoves(Board board)
         {
             var list = new List<Point>();
 

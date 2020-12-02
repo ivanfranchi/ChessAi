@@ -37,25 +37,92 @@ namespace ChessAI.Management
             }
 
             //check if piece has legal moves
-            if(!moves.TryGetValue(pieceToMove, out var legalMoves) || legalMoves.Count == 0)
+            if (!moves.TryGetValue(pieceToMove, out var legalMovesForPiece) || legalMovesForPiece.Count == 0)
             {
                 throw new Exception("No legal moves for piece.");
             }
 
             //check if the move we are asking exists in the list of legal moves
-            var move = legalMoves.GetMoveByCoordinates(toPosition);
-
-            //remove if something at arrival position
-            var pieceToRemove = pieces.GetPieceByPosition(toPosition);
-            if (pieceToRemove != null)
+            if (!legalMovesForPiece.IsLegal(toPosition))
             {
-                pieces.Remove(pieceToRemove);
+                throw new Exception("Move is not legal, if you think this is an error ...");
+            }
+
+            var pieceAtArrivalPosition = pieces.GetPieceByPosition(toPosition);
+            bool isCastle = false;
+            if (pieceAtArrivalPosition != null)
+            {
+                if (pieceToMove.IsWhite == pieceAtArrivalPosition.IsWhite)
+                {
+                    isCastle = IsShortCastle(pieceToMove, pieceAtArrivalPosition);
+                    if (isCastle)
+                    {
+                        pieceToMove.Position = new Point(6, pieceToMove.Position.Y);
+                        pieceAtArrivalPosition.Position = new Point(5, pieceToMove.Position.Y);
+                    }
+                    else
+                    {
+                        //isCastle = IsLongCastle(pieceToMove, pieceToRemove);
+                        //if (isCastle)
+                        //{
+                        //    pieceToMove.Position = new Point(6, pieceToMove.Position.Y);
+                        //    pieceToRemove.Position = new Point(5, pieceToMove.Position.Y);
+                        //}
+                        //else
+                        //{
+                        throw new Exception("You can't eat your own pieces.");
+                        //}
+                    }
+                }
+                else
+                {
+                    pieces.Remove(pieceAtArrivalPosition);
+                }
             }
 
             //update piece current position
-            pieceToMove.Position = toPosition;
+            if (!isCastle)
+            {
+                pieceToMove.Position = toPosition;
+            }
 
+            if (pieceToMove is King)
+            {
+                ((King)pieceToMove).HasMoved = true;
+            }
+            if (pieceToMove is Rook)
+            {
+                ((Rook)pieceToMove).HasMoved = true;
+            }
             movesCounter++;
+        }
+
+        public bool CanCastleShort(Piece king)
+        {
+            bool isWhite = king.IsWhite;
+            int y = isWhite ? 0 : 7;
+
+            Piece tmpRook = pieces.GetPieceByPosition(new Point(7, y));
+            //rook in corner and never moved
+            if (tmpRook != null
+                && tmpRook is Rook
+                && !((Rook)tmpRook).HasMoved
+                && king.IsWhite == tmpRook.IsWhite)
+            {
+                //empty way from bishop and knight
+                if (pieces.GetPieceByPosition(new Point(5, y)) == null
+                    && pieces.GetPieceByPosition(new Point(6, y)) == null)
+                {
+                    //f1/f7 or g2/g7 not under enemy check
+                    if (!moves.IsCoordinateUnderThreat(!isWhite, new Point(5, y))
+                        && !moves.IsCoordinateUnderThreat(!isWhite, new Point(6, y)))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -75,24 +142,38 @@ namespace ChessAI.Management
             return board;
         }
 
-        public int GetMovesCounter()
-        {
-            return movesCounter;
-        }
+        public int MovesCounter => movesCounter;
 
-        public Dictionary<Piece, List<Point>> GetMoves(bool color)
+        public Dictionary<Piece, List<Point>> GetMoves(bool isWhite)
         {
             moves = new Dictionary<Piece, List<Point>>();
+            List<Piece> kings = new List<Piece>();
 
             foreach (var piece in pieces)
             {
-                if(piece.IsWhite == color)
+                //check king moves as last thing (check for checks)
+                if (piece is King)
                 {
-                    moves.Add(piece, piece.GetLegalMoves());
+                    kings.Add(piece);
+                    continue;
+                }
+                moves.Add(piece, piece.GetLegalMoves(this));
+            }
+            foreach (var piece in kings)
+            {
+                moves.Add(piece, piece.GetLegalMoves(this));
+            }
+
+            Dictionary<Piece, List<Point>> retArray = new Dictionary<Piece, List<Point>>();
+            foreach (var move in moves)
+            {
+                if (move.Key.IsWhite == isWhite)
+                {
+                    retArray.Add(move.Key, move.Value);
                 }
             }
 
-            return moves;
+            return retArray;
         }
 
         public double EvaluateBoard()
@@ -137,33 +218,33 @@ namespace ChessAI.Management
             pieces = new List<Piece>();
 
             //whites
-            pieces.Add(new Rook(true, new Point(0, 0), false));
+            pieces.Add(new Rook(true, new Point(0, 0)));
             pieces.Add(new Knight(true, new Point(1, 0)));
             pieces.Add(new Bishop(true, new Point(2, 0)));
             pieces.Add(new Queen(true, new Point(3, 0)));
-            pieces.Add(new King(true, new Point(4, 0), false));
-            pieces.Add(new Bishop(true, new Point(5, 0)));
-            pieces.Add(new Knight(true, new Point(6, 0)));
-            pieces.Add(new Rook(true, new Point(7, 0), false));
+            pieces.Add(new King(true, new Point(4, 0)));
+            //pieces.Add(new Bishop(true, new Point(5, 0)));
+            //pieces.Add(new Knight(true, new Point(6, 0)));
+            pieces.Add(new Rook(true, new Point(7, 0)));
 
             pieces.Add(new Pawn(true, new Point(0, 1)));
             pieces.Add(new Pawn(true, new Point(1, 1)));
             pieces.Add(new Pawn(true, new Point(2, 1)));
             pieces.Add(new Pawn(true, new Point(3, 1)));
             pieces.Add(new Pawn(true, new Point(4, 1)));
-            pieces.Add(new Pawn(true, new Point(5, 1)));
-            pieces.Add(new Pawn(true, new Point(6, 1)));
+            //pieces.Add(new Pawn(true, new Point(5, 1)));
+            //pieces.Add(new Pawn(true, new Point(6, 1)));
             pieces.Add(new Pawn(true, new Point(7, 1)));
 
             //blacks
-            pieces.Add(new Rook(false, new Point(0, 7), false));
+            pieces.Add(new Rook(false, new Point(0, 7)));
             pieces.Add(new Knight(false, new Point(1, 7)));
             pieces.Add(new Bishop(false, new Point(2, 7)));
             pieces.Add(new Queen(false, new Point(3, 7)));
-            pieces.Add(new King(false, new Point(4, 7), false));
+            pieces.Add(new King(false, new Point(4, 7)));
             pieces.Add(new Bishop(false, new Point(5, 7)));
             pieces.Add(new Knight(false, new Point(6, 7)));
-            pieces.Add(new Rook(false, new Point(7, 7), false));
+            pieces.Add(new Rook(false, new Point(7, 7)));
 
             pieces.Add(new Pawn(false, new Point(0, 6)));
             pieces.Add(new Pawn(false, new Point(1, 6)));
@@ -175,6 +256,7 @@ namespace ChessAI.Management
             pieces.Add(new Pawn(false, new Point(7, 6)));
 
             //testsss
+            pieces.Add(new Rook(false, new Point(5, 5))); //the anti castle
             //pieces.Add(new Pawn(true, new Point(4, 4)));
         }
 
@@ -193,6 +275,18 @@ namespace ChessAI.Management
             {
                 return piece.Name.ToLower();
             }
+        }
+
+        private bool IsShortCastle(Piece king, Piece rook)
+        {
+            if (king is King
+                && rook is Rook
+                && king.Position.X == 4
+                && rook.Position.X == 7)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

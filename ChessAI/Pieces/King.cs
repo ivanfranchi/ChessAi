@@ -9,19 +9,18 @@ namespace ChessAI.Pieces
     {
         public King(
             bool isWhite,
-            Point position,
-            bool hasMoved)
+            Point position)
             : base(
                 isWhite,
                 "K",
                 position)
         {
-            HasMoved = hasMoved;
+            HasMoved = false;
         }
 
-        public bool HasMoved { get; }
+        public bool HasMoved { get; set; }
 
-        public override List<Point> GetLegalMoves()
+        public override List<Point> GetLegalMoves(Board board)
         {
             var list = new List<Point>();
 
@@ -59,7 +58,7 @@ namespace ChessAI.Pieces
 
             if(!HasMoved)
             {
-                Castle(ref list, Position);
+                Castle(ref list, board);
             }
 
             return list;
@@ -97,12 +96,18 @@ namespace ChessAI.Pieces
             }
         }
 
-        private void Castle(ref List<Point> list, Point currentPosition)
+        private void Castle(ref List<Point> list, Board board)
         {
-            //if empty room
-            //if no checks on the way
-
-            //add castle move
+            if (board.CanCastleShort(this))
+            {
+                int y = IsWhite ? 0 : 7;
+                list.Add(new Point(7, y));
+            }
+            //if (board.CanCastleLong(this))
+            //{
+            //    int y = IsWhite ? 0 : 7;
+            //    list.Add(new Point(0, y));
+            //}
         }
     }
 }

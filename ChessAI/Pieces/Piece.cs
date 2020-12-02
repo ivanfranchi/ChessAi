@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ChessAI.Management;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace ChessAI.Pieces
@@ -30,7 +31,7 @@ namespace ChessAI.Pieces
         public Point Position { get; set; }
         public double Score { get; private set; }
 
-        public abstract List<Point> GetLegalMoves();
+        public abstract List<Point> GetLegalMoves(Board board = null);
         
         private void GiveScore(string name)
         {

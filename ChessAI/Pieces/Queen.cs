@@ -16,7 +16,7 @@ namespace ChessAI.Pieces
                 position)
         { }
 
-        public override List<Point> GetLegalMoves()
+        public override List<Point> GetLegalMoves(Board board)
         {
             var list = new List<Point>();
 

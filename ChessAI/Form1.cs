@@ -29,15 +29,29 @@ namespace ChessAI
         {
             lock (guardClick)
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    var moves = board.GetMoves(board.isWhiteTurn);
-                    var move = PickMove(moves);
-                    ExecuteFromToPoint(move[0], move[1]);
-                    board.isWhiteTurn = !board.isWhiteTurn;
-                    UpdateScore();
-                    UpdateMovesCounter();
-                }
+                //var moves = board.GetMoves(board.isWhiteTurn);
+                //var move = new Point[2] { new Point(4, 0), new Point(7, 0) };
+                //ExecuteFromToPoint(move[0], move[1]);
+                //board.isWhiteTurn = !board.isWhiteTurn;
+                //UpdateScore();
+                //UpdateMovesCounter();
+
+                //for (int i = 0; i < 10; i++)
+                //{
+                    try
+                    {
+                        var moves = board.GetMoves(board.isWhiteTurn);
+                        var move = PickMove(moves);
+                        ExecuteFromToPoint(move[0], move[1]);
+                        board.isWhiteTurn = !board.isWhiteTurn;
+                        UpdateScore();
+                        UpdateMovesCounter();
+                    }
+                    catch
+                    {
+                        return;
+                    }
+                //}
             }
         }
 
@@ -48,22 +62,30 @@ namespace ChessAI
 
         private void UpdateMovesCounter()
         {
-            lblMovesCounter.Text = board.GetMovesCounter().ToString();
+            lblMovesCounter.Text = board.MovesCounter.ToString();
         }
 
 
 
         private Point[] PickMove(Dictionary<Piece, List<Point>> totalMoves)
         {
-            var moves = RemovePiecesWithoutMoves(totalMoves);
+            try
+            {
+                var moves = RemovePiecesWithoutMoves(totalMoves);
 
-            var num = GetNum(0, moves.Keys.Count);
-            var piece = moves.ElementAt(num);
+                var num = GetNum(0, moves.Keys.Count);
+                var piece = moves.ElementAt(num);
 
-            num = GetNum(0, piece.Value.Count);
-            var move = piece.Value.ElementAt(num);
+                num = GetNum(0, piece.Value.Count);
+                var move = piece.Value.ElementAt(num);
 
-            return new Point[2] { piece.Key.Position, move };
+                return new Point[2] { piece.Key.Position, move };
+            }
+            catch
+            {
+                lblError.Text = "No legal moves available";
+                throw;
+            }
         }
 
         private Dictionary<Piece, List<Point>> RemovePiecesWithoutMoves(Dictionary<Piece, List<Point>> moves)
@@ -81,15 +103,7 @@ namespace ChessAI
 
         private int GetNum(int min, int max)
         {
-            try
-            {
-                return rnd.Next(min, max - 1);
-            }
-            catch
-            {
-                lblError.Text = "No legal moves available";
-                throw;
-            }
+            return rnd.Next(min, max - 1);
         }
 
         private void UpdateStringedBoard()

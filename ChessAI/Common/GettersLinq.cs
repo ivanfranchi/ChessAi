@@ -12,9 +12,25 @@ namespace ChessAI.Common
             return pieces.SingleOrDefault(atPosition => atPosition.Position == position);
         }
 
-        public static Point GetMoveByCoordinates(this List<Point> moves, Point coordinate)
+        public static bool IsLegal(
+            this List<Point> moves,
+            Point coordinate)
         {
-            return moves.SingleOrDefault(move => move.X == coordinate.X && move.Y == coordinate.Y);
+            return moves.Contains(coordinate);
+        }
+
+        public static bool IsCoordinateUnderThreat(
+            this Dictionary<Piece, List<Point>> moves,
+            bool isWhiteThreatener,
+            Point coordinate)
+        {
+            var movesForColor = moves.Where(piece => piece.Key.IsWhite == isWhiteThreatener);
+            List<Point> listThreats = new List<Point>();
+            foreach (var piece in movesForColor)
+            {
+                listThreats.AddRange(piece.Value);
+            }
+            return listThreats.Contains(coordinate);
         }
     }
 }
