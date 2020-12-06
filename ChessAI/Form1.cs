@@ -65,8 +65,6 @@ namespace ChessAI
             lblMovesCounter.Text = board.MovesCounter.ToString();
         }
 
-
-
         private Point[] PickMove(Dictionary<Piece, List<Point>> totalMoves)
         {
             try

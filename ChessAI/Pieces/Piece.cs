@@ -31,7 +31,18 @@ namespace ChessAI.Pieces
         public Point Position { get; set; }
         public double Score { get; private set; }
 
-        public abstract List<Point> GetLegalMoves(Board board = null);
+        /// <summary>
+        /// Moves allowed for a given piece
+        /// </summary>
+        /// <param name="board">Reference to the knowledge</param>
+        /// <returns>List of moves allowed for the piece</returns>
+        public abstract List<Point> GetLegalMoves();
+
+        /// <summary>
+        /// Covered squares contains all the legal moves for a piece + the ally pieces covered by this piece
+        /// </summary>
+        /// <returns>List of covered squares</returns>
+        public abstract List<Point> GetCoveredSquares();
         
         private void GiveScore(string name)
         {

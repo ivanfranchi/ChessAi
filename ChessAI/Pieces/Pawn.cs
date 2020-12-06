@@ -16,7 +16,17 @@ namespace ChessAI.Pieces
                 position)
         { }
 
-        public override List<Point> GetLegalMoves(Board board)
+        public override List<Point> GetLegalMoves()
+        {
+            return GetMoves(true);
+        }
+
+        public override List<Point> GetCoveredSquares()
+        {
+            return GetMoves(false);
+        }
+
+        private List<Point> GetMoves(bool onlyLegals)
         {
             var list = new List<Point>();
 
@@ -30,9 +40,9 @@ namespace ChessAI.Pieces
             }
 
             //left
-            EatLeftAndRight(ref list, Position, IsWhite, isEatingLeft: true);
+            EatLeftAndRight(ref list, Position, IsWhite, isEatingLeft: true, onlyLegals);
             //right
-            EatLeftAndRight(ref list, Position, IsWhite, isEatingLeft: false);
+            EatLeftAndRight(ref list, Position, IsWhite, isEatingLeft: false, onlyLegals);
 
             //enpassant TODO
             EnPassant(ref list, Position, IsWhite);
@@ -41,7 +51,11 @@ namespace ChessAI.Pieces
         }
 
         //To perform double step check first if step is legal then to step again
-        private void OneOrDoubleStep(ref List<Point> list, Point currentPosition, bool isWhite, bool isSingleStep)
+        private void OneOrDoubleStep(
+            ref List<Point> list,
+            Point currentPosition,
+            bool isWhite, 
+            bool isSingleStep)
         {
             var step = 1;
             if (!isWhite)
@@ -80,7 +94,12 @@ namespace ChessAI.Pieces
             }
         }
 
-        private void EatLeftAndRight(ref List<Point> list, Point currentPosition, bool isWhite, bool isEatingLeft)
+        private void EatLeftAndRight(
+            ref List<Point> list,
+            Point currentPosition,
+            bool isWhite,
+            bool isEatingLeft,
+            bool onlyLegals)
         {
             int stepX = isEatingLeft ? -1 : +1;
             int stepY = isWhite ? 1 : -1;
@@ -97,6 +116,10 @@ namespace ChessAI.Pieces
                 {
                     return; //stopping atm
                 }
+                list.Add(nextPosition);
+            }
+            if (conflict == ConflictType.Ally && !onlyLegals)
+            {
                 list.Add(nextPosition);
             }
         }

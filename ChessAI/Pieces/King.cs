@@ -20,43 +20,53 @@ namespace ChessAI.Pieces
 
         public bool HasMoved { get; set; }
 
-        public override List<Point> GetLegalMoves(Board board)
+        public List<Point> GetKingMoves(Board board, List<Point> listOfThreats)
+        {
+            return GetMoves(board, true, listOfThreats);
+        }
+
+        public override List<Point> GetCoveredSquares()
+        {
+            return GetMoves(null, false, null);
+        }
+
+        private List<Point> GetMoves(Board board, bool onlyLegals, List<Point> listOfThreats)
         {
             var list = new List<Point>();
 
             var incrementX = 0;
             var incrementY = 1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
             incrementX = 1;
             incrementY = 1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
             incrementX = 1;
             incrementY = 0;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
             incrementX = 1;
             incrementY = -1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
             incrementX = 0;
             incrementY = -1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
             incrementX = -1;
             incrementY = -1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
             incrementX = -1;
             incrementY = 0;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
             incrementX = -1;
             incrementY = 1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals, listOfThreats);
 
-            if(!HasMoved)
+            if (!HasMoved && onlyLegals)
             {
                 Castle(ref list, board);
             }
@@ -71,7 +81,13 @@ namespace ChessAI.Pieces
         /// <param name="incrementX">direction of search</param>
         /// <param name="incrementY">direction of search</param>
         /// <param name="currentPosition">current position from where to check the next position</param>
-        private void GetMovesForDirection(ref List<Point> list, int incrementX, int incrementY, Point currentPosition)
+        private void GetMovesForDirection(
+            ref List<Point> list,
+            int incrementX,
+            int incrementY,
+            Point currentPosition,
+            bool onlyLegals,
+            List<Point> listOfThreats)
         {
             Point nextPosition;
             ConflictType conflict;
@@ -85,6 +101,12 @@ namespace ChessAI.Pieces
                 return;
             }
 
+            //walking on checks
+            if (onlyLegals && listOfThreats.Contains(nextPosition))
+            {
+                return;
+            }
+
             conflict = Board.CheckConflict(this, nextPosition);
             if (conflict == ConflictType.Enemy)
             {
@@ -94,20 +116,31 @@ namespace ChessAI.Pieces
             {
                 list.Add(nextPosition);
             }
+            if (conflict == ConflictType.Ally && !onlyLegals)
+            {
+                list.Add(nextPosition);
+            }
         }
 
         private void Castle(ref List<Point> list, Board board)
         {
-            if (board.CanCastleShort(this))
+
+            // rewrite with new list of threats. No need for board reference anymore
+            if (board.CanCastle(this, true))
             {
                 int y = IsWhite ? 0 : 7;
                 list.Add(new Point(7, y));
             }
-            //if (board.CanCastleLong(this))
-            //{
-            //    int y = IsWhite ? 0 : 7;
-            //    list.Add(new Point(0, y));
-            //}
+            if (board.CanCastle(this, false))
+            {
+                int y = IsWhite ? 0 : 7;
+                list.Add(new Point(0, y));
+            }
+        }
+
+        public override List<Point> GetLegalMoves()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

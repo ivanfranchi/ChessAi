@@ -14,6 +14,8 @@ namespace ChessAI.Management
         int movesCounter = 0;
         Dictionary<Piece, List<Point>> moves;
         Dictionary<Piece, List<Point>> pastMoves; //history management
+        List<Point> listOfThreatsWhite = new List<Point>();
+        List<Point> listOfThreatsBlack = new List<Point>();
 
         public Board()
         {
@@ -49,29 +51,29 @@ namespace ChessAI.Management
             }
 
             var pieceAtArrivalPosition = pieces.GetPieceByPosition(toPosition);
-            bool isCastle = false;
+            bool isCastling = false;
             if (pieceAtArrivalPosition != null)
             {
                 if (pieceToMove.IsWhite == pieceAtArrivalPosition.IsWhite)
                 {
-                    isCastle = IsShortCastle(pieceToMove, pieceAtArrivalPosition);
-                    if (isCastle)
+                    isCastling = IsShortCastle(pieceToMove, pieceAtArrivalPosition);
+                    if (isCastling)
                     {
                         pieceToMove.Position = new Point(6, pieceToMove.Position.Y);
                         pieceAtArrivalPosition.Position = new Point(5, pieceToMove.Position.Y);
                     }
                     else
                     {
-                        //isCastle = IsLongCastle(pieceToMove, pieceToRemove);
-                        //if (isCastle)
-                        //{
-                        //    pieceToMove.Position = new Point(6, pieceToMove.Position.Y);
-                        //    pieceToRemove.Position = new Point(5, pieceToMove.Position.Y);
-                        //}
-                        //else
-                        //{
-                        throw new Exception("You can't eat your own pieces.");
-                        //}
+                        isCastling = IsLongCastle(pieceToMove, pieceAtArrivalPosition);
+                        if (isCastling)
+                        {
+                            pieceToMove.Position = new Point(2, pieceToMove.Position.Y);
+                            pieceAtArrivalPosition.Position = new Point(3, pieceToMove.Position.Y);
+                        }
+                        else
+                        {
+                            throw new Exception("You can't eat your own pieces.");
+                        }
                     }
                 }
                 else
@@ -81,7 +83,7 @@ namespace ChessAI.Management
             }
 
             //update piece current position
-            if (!isCastle)
+            if (!isCastling)
             {
                 pieceToMove.Position = toPosition;
             }
@@ -97,27 +99,46 @@ namespace ChessAI.Management
             movesCounter++;
         }
 
-        public bool CanCastleShort(Piece king)
+        public bool CanCastle(Piece king, bool isShort)
         {
             bool isWhite = king.IsWhite;
             int y = isWhite ? 0 : 7;
+            int rookX = isShort ? 7 : 0;
 
-            Piece tmpRook = pieces.GetPieceByPosition(new Point(7, y));
+            Piece tmpRook = pieces.GetPieceByPosition(new Point(rookX, y));
             //rook in corner and never moved
             if (tmpRook != null
                 && tmpRook is Rook
                 && !((Rook)tmpRook).HasMoved
                 && king.IsWhite == tmpRook.IsWhite)
             {
-                //empty way from bishop and knight
-                if (pieces.GetPieceByPosition(new Point(5, y)) == null
-                    && pieces.GetPieceByPosition(new Point(6, y)) == null)
+                if (isShort)
                 {
-                    //f1/f7 or g2/g7 not under enemy check
-                    if (!moves.IsCoordinateUnderThreat(!isWhite, new Point(5, y))
-                        && !moves.IsCoordinateUnderThreat(!isWhite, new Point(6, y)))
+                    //empty way from bishop and knight
+                    if (pieces.GetPieceByPosition(new Point(5, y)) == null
+                        && pieces.GetPieceByPosition(new Point(6, y)) == null)
                     {
-                        return true;
+                        //f1/f7 and g1/g7 not under enemy check
+                        if (!moves.IsCoordinateUnderThreat(!isWhite, new Point(5, y))
+                            && !moves.IsCoordinateUnderThreat(!isWhite, new Point(6, y)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else //long castle
+                {
+                    //empty way from queen bishop and knight
+                    if (pieces.GetPieceByPosition(new Point(3, y)) == null
+                        && pieces.GetPieceByPosition(new Point(2, y)) == null
+                        && pieces.GetPieceByPosition(new Point(1, y)) == null)
+                    {
+                        //c1/c7 and d1/d7 not under enemy check
+                        if (!moves.IsCoordinateUnderThreat(!isWhite, new Point(3, y))
+                            && !moves.IsCoordinateUnderThreat(!isWhite, new Point(2, y)))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -146,6 +167,9 @@ namespace ChessAI.Management
 
         public Dictionary<Piece, List<Point>> GetMoves(bool isWhite)
         {
+            var listOfThreats = new List<Point>();
+            var enemyThreats = isWhite ? listOfThreatsBlack : listOfThreatsWhite;
+            
             moves = new Dictionary<Piece, List<Point>>();
             List<Piece> kings = new List<Piece>();
 
@@ -157,11 +181,22 @@ namespace ChessAI.Management
                     kings.Add(piece);
                     continue;
                 }
-                moves.Add(piece, piece.GetLegalMoves(this));
+                moves.Add(piece, piece.GetLegalMoves());
+                listOfThreats.AddRange(piece.GetCoveredSquares());
             }
             foreach (var piece in kings)
             {
-                moves.Add(piece, piece.GetLegalMoves(this));
+                moves.Add(piece, ((King)piece).GetKingMoves(this, enemyThreats));
+                listOfThreats.AddRange(piece.GetCoveredSquares());
+            }
+
+            if (isWhite)
+            {
+                listOfThreatsWhite = new List<Point>(listOfThreats);
+            }
+            else
+            {
+                listOfThreatsBlack = new List<Point>(listOfThreats);
             }
 
             Dictionary<Piece, List<Point>> retArray = new Dictionary<Piece, List<Point>>();
@@ -283,6 +318,17 @@ namespace ChessAI.Management
                 && rook is Rook
                 && king.Position.X == 4
                 && rook.Position.X == 7)
+            {
+                return true;
+            }
+            return false;
+        }
+        private bool IsLongCastle(Piece king, Piece rook)
+        {
+            if (king is King
+                && rook is Rook
+                && king.Position.X == 4
+                && rook.Position.X == 0)
             {
                 return true;
             }

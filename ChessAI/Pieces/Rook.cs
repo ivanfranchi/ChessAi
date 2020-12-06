@@ -20,25 +20,35 @@ namespace ChessAI.Pieces
 
         public bool HasMoved { get; set; }
 
-        public override List<Point> GetLegalMoves(Board board)
+        public override List<Point> GetLegalMoves()
+        {
+            return GetMoves(true);
+        }
+
+        public override List<Point> GetCoveredSquares()
+        {
+            return GetMoves(false);
+        }
+
+        private List<Point> GetMoves(bool onlyLegals)
         {
             var list = new List<Point>();
 
             var incrementX = 0;
             var incrementY = 1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals);
 
             incrementX = 1;
             incrementY = 0;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals);
 
             incrementX = 0;
             incrementY = -1;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals);
 
             incrementX = -1;
             incrementY = 0;
-            GetMovesForDirection(ref list, incrementX, incrementY, Position);
+            GetMovesForDirection(ref list, incrementX, incrementY, Position, onlyLegals);
 
             return list;
         }
@@ -50,7 +60,12 @@ namespace ChessAI.Pieces
         /// <param name="incrementX">direction of search</param>
         /// <param name="incrementY">direction of search</param>
         /// <param name="currentPosition">current position from where to check the next position</param>
-        private void GetMovesForDirection(ref List<Point> list, int incrementX, int incrementY, Point currentPosition)
+        private void GetMovesForDirection(
+            ref List<Point> list, 
+            int incrementX,
+            int incrementY, 
+            Point currentPosition,
+            bool onlyLegals)
         {
             Point nextPosition;
             ConflictType conflict;
@@ -69,6 +84,10 @@ namespace ChessAI.Pieces
                 conflict = Board.CheckConflict(this, nextPosition);
                 if (conflict == ConflictType.Ally)
                 {
+                    if (!onlyLegals)
+                    {
+                        list.Add(nextPosition);
+                    }
                     return;
                 }
                 if (conflict == ConflictType.Enemy)
