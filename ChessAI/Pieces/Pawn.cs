@@ -16,7 +16,7 @@ namespace ChessAI.Pieces
                 position)
         { }
 
-        public override List<Point> GetLegalMoves()
+        public override List<Point> GetMoves()
         {
             return GetMoves(true);
         }
@@ -72,12 +72,14 @@ namespace ChessAI.Pieces
             {
                 if (isSingleStep)
                 {
-                    if (Promoting(isWhite, nextPosition.Y))
+                    if (IsPromoting(nextPosition.Y))
                     {
-                        return; //stopping atm
-                    }
 
-                    list.Add(nextPosition);
+                    }
+                    else
+                    {
+                        list.Add(nextPosition);
+                    }
                 }
                 else
                 {
@@ -111,12 +113,14 @@ namespace ChessAI.Pieces
             ConflictType conflict = Board.CheckConflict(this, nextPosition);
             if (conflict == ConflictType.Enemy)
             {
-                //check for promotion...
-                if (Promoting(isWhite, nextPosition.Y))
+                if (IsPromoting(nextPosition.Y))
                 {
-                    return; //stopping atm
+
                 }
-                list.Add(nextPosition);
+                else
+                {
+                    list.Add(nextPosition);
+                }
             }
             if (conflict == ConflictType.Ally && !onlyLegals)
             {
@@ -129,9 +133,9 @@ namespace ChessAI.Pieces
             //check if previous move was double step and pawn has arrived next to us...then check for conflicts etc
         }
 
-        private bool Promoting(bool isWhite, int nextPositionY)
+        private bool IsPromoting(int nextPositionY)
         {
-            return isWhite && nextPositionY == 7 || !isWhite && nextPositionY == 0;
+            return nextPositionY == 7 || nextPositionY == 0;
         }
     }
 }

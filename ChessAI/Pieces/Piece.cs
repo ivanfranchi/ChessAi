@@ -36,7 +36,7 @@ namespace ChessAI.Pieces
         /// </summary>
         /// <param name="board">Reference to the knowledge</param>
         /// <returns>List of moves allowed for the piece</returns>
-        public abstract List<Point> GetLegalMoves();
+        public abstract List<Point> GetMoves();
 
         /// <summary>
         /// Covered squares contains all the legal moves for a piece + the ally pieces covered by this piece

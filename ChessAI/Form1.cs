@@ -29,29 +29,23 @@ namespace ChessAI
         {
             lock (guardClick)
             {
-                //var moves = board.GetMoves(board.isWhiteTurn);
-                //var move = new Point[2] { new Point(4, 0), new Point(7, 0) };
-                //ExecuteFromToPoint(move[0], move[1]);
-                //board.isWhiteTurn = !board.isWhiteTurn;
-                //UpdateScore();
-                //UpdateMovesCounter();
-
-                //for (int i = 0; i < 10; i++)
-                //{
+                for (int i = 0; i < 13; i++)
+                {
                     try
                     {
-                        var moves = board.GetMoves(board.isWhiteTurn);
+                        var moves = board.GetPossibleMoves();
                         var move = PickMove(moves);
                         ExecuteFromToPoint(move[0], move[1]);
-                        board.isWhiteTurn = !board.isWhiteTurn;
                         UpdateScore();
                         UpdateMovesCounter();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        //Console.WriteLine("From: ") //write down what happened
+                        lblError.Text = ex.Message;
                         return;
                     }
-                //}
+                }
             }
         }
 
@@ -65,6 +59,11 @@ namespace ChessAI
             lblMovesCounter.Text = board.MovesCounter.ToString();
         }
 
+        /// <summary>
+        /// Pick a move among the legal moves
+        /// </summary>
+        /// <param name="totalMoves">legal moves</param>
+        /// <returns>A point to point movement</returns>
         private Point[] PickMove(Dictionary<Piece, List<Point>> totalMoves)
         {
             try
@@ -81,11 +80,15 @@ namespace ChessAI
             }
             catch
             {
-                lblError.Text = "No legal moves available";
-                throw;
+                throw new Exception("No legal moves available");
             }
         }
 
+        /// <summary>
+        /// Removes the pieces with no legal moves
+        /// </summary>
+        /// <param name="moves">legal moves</param>
+        /// <returns>A list with only pieces with a legal move available</returns>
         private Dictionary<Piece, List<Point>> RemovePiecesWithoutMoves(Dictionary<Piece, List<Point>> moves)
         {
             Dictionary<Piece, List<Point>> cleanDictionary = new Dictionary<Piece, List<Point>>();
@@ -99,11 +102,13 @@ namespace ChessAI
             return cleanDictionary;
         }
 
+        //Random, get a move
         private int GetNum(int min, int max)
         {
             return rnd.Next(min, max - 1);
         }
 
+        //redraw the board from its stringed version from board
         private void UpdateStringedBoard()
         {
             var pieces = board.GetStringedBoard();
@@ -131,7 +136,7 @@ namespace ChessAI
             txtBoard.Text = stringedBoard;
         }
 
-
+        //call the board.move
         private void ExecuteFromToPoint(Point toPosition, Point toGo)
         {
             try
@@ -150,7 +155,7 @@ namespace ChessAI
         }
 
         /// <summary>
-        /// Read from - to move
+        /// Read from - to move from textbox
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

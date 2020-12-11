@@ -16,7 +16,7 @@ namespace ChessAI.Pieces
                 position)
         { }
 
-        public override List<Point> GetLegalMoves()
+        public override List<Point> GetMoves()
         {
             return GetMoves(true);
         }
@@ -86,7 +86,7 @@ namespace ChessAI.Pieces
                 currentPosition.X + incrementX,
                 currentPosition.Y + incrementY);
 
-            if (!OperatorOverloading.IsPositionOnBoard(nextPosition))
+            if (!EnsureState.IsPositionOnBoard(nextPosition))
             {
                 return;
             }

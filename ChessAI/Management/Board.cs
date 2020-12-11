@@ -12,16 +12,27 @@ namespace ChessAI.Management
         public bool isWhiteTurn = true;
         static List<Piece> pieces;
         int movesCounter = 0;
-        Dictionary<Piece, List<Point>> moves;
+        Dictionary<Piece, List<Point>> legalPiecesMoves = new Dictionary<Piece, List<Point>>();
         Dictionary<Piece, List<Point>> pastMoves; //history management
-        List<Point> listOfThreatsWhite = new List<Point>();
-        List<Point> listOfThreatsBlack = new List<Point>();
+        IEnumerable<Point> enemyThreats = new List<Point>();
 
         public Board()
         {
             FillStartingBoard();
 
             pastMoves = new Dictionary<Piece, List<Point>>();
+        }
+
+        public string[,] GetStringedBoard()
+        {
+            return InterfaceData.GetStringedBoard(pieces);
+        }
+
+        public int MovesCounter => movesCounter;
+
+        public double EvaluateBoard()
+        {
+            return InterfaceData.EvaluateBoard(pieces);
         }
 
         /// <summary>
@@ -35,28 +46,28 @@ namespace ChessAI.Management
             var pieceToMove = pieces.SingleOrDefault(atPosition => atPosition.Position == fromPosition);
             if (pieceToMove == null)
             {
-                throw new Exception("No piece at starting position.");
+                throw new Exception(Messages.NoPieceAtStart);
             }
 
             //check if piece has legal moves
-            if (!moves.TryGetValue(pieceToMove, out var legalMovesForPiece) || legalMovesForPiece.Count == 0)
+            if (!legalPiecesMoves.TryGetValue(pieceToMove, out var legalMovesForPiece) || legalMovesForPiece.Count == 0)
             {
-                throw new Exception("No legal moves for piece.");
+                throw new Exception(Messages.NoLegalMoves);
             }
 
             //check if the move we are asking exists in the list of legal moves
             if (!legalMovesForPiece.IsLegal(toPosition))
             {
-                throw new Exception("Move is not legal, if you think this is an error ...");
+                throw new Exception(Messages.IllegalMove);
             }
 
             var pieceAtArrivalPosition = pieces.GetPieceByPosition(toPosition);
             bool isCastling = false;
             if (pieceAtArrivalPosition != null)
             {
-                if (pieceToMove.IsWhite == pieceAtArrivalPosition.IsWhite)
+                if (pieceToMove.SameColor(pieceAtArrivalPosition))
                 {
-                    isCastling = IsShortCastle(pieceToMove, pieceAtArrivalPosition);
+                    isCastling = pieceToMove.IsCastle(pieceAtArrivalPosition);
                     if (isCastling)
                     {
                         pieceToMove.Position = new Point(6, pieceToMove.Position.Y);
@@ -64,7 +75,7 @@ namespace ChessAI.Management
                     }
                     else
                     {
-                        isCastling = IsLongCastle(pieceToMove, pieceAtArrivalPosition);
+                        isCastling = pieceToMove.IsCastle(pieceAtArrivalPosition);
                         if (isCastling)
                         {
                             pieceToMove.Position = new Point(2, pieceToMove.Position.Y);
@@ -72,7 +83,7 @@ namespace ChessAI.Management
                         }
                         else
                         {
-                            throw new Exception("You can't eat your own pieces.");
+                            throw new Exception(Messages.CantEatYourPiece);
                         }
                     }
                 }
@@ -96,7 +107,31 @@ namespace ChessAI.Management
             {
                 ((Rook)pieceToMove).HasMoved = true;
             }
-            movesCounter++;
+
+            UpdateStatus();
+        }
+
+        public Dictionary<Piece, List<Point>> GetPossibleMoves()
+        {
+            SetEnemyThreats(isWhiteTurn);
+            SetLegalMoves(isWhiteTurn);
+
+            return legalPiecesMoves;
+        }
+
+        public static ConflictType CheckConflict(Piece piece, Point arrivingPosition)
+        {
+            return PiecesMoves.CheckConflict(pieces, piece, arrivingPosition);
+        }
+
+        private void SetEnemyThreats(bool isTurnWhite)
+        {
+            enemyThreats = PiecesMoves.GetListOfThreats(pieces, !isTurnWhite);
+        }
+
+        private void SetLegalMoves(bool isTurnWhite)
+        {
+            legalPiecesMoves = PiecesMoves.GetMoves(pieces, isTurnWhite, enemyThreats, this);
         }
 
         public bool CanCastle(Piece king, bool isShort)
@@ -119,8 +154,8 @@ namespace ChessAI.Management
                         && pieces.GetPieceByPosition(new Point(6, y)) == null)
                     {
                         //f1/f7 and g1/g7 not under enemy check
-                        if (!moves.IsCoordinateUnderThreat(!isWhite, new Point(5, y))
-                            && !moves.IsCoordinateUnderThreat(!isWhite, new Point(6, y)))
+                        if (!legalPiecesMoves.IsCoordinateUnderThreat(!isWhite, new Point(5, y))
+                            && !legalPiecesMoves.IsCoordinateUnderThreat(!isWhite, new Point(6, y)))
                         {
                             return true;
                         }
@@ -134,8 +169,8 @@ namespace ChessAI.Management
                         && pieces.GetPieceByPosition(new Point(1, y)) == null)
                     {
                         //c1/c7 and d1/d7 not under enemy check
-                        if (!moves.IsCoordinateUnderThreat(!isWhite, new Point(3, y))
-                            && !moves.IsCoordinateUnderThreat(!isWhite, new Point(2, y)))
+                        if (!legalPiecesMoves.IsCoordinateUnderThreat(!isWhite, new Point(3, y))
+                            && !legalPiecesMoves.IsCoordinateUnderThreat(!isWhite, new Point(2, y)))
                         {
                             return true;
                         }
@@ -146,103 +181,20 @@ namespace ChessAI.Management
             return false;
         }
 
-        /// <summary>
-        /// Get a string representation of the board
-        /// </summary>
-        /// <returns>8*8 string matrix of the board</returns>
-        public string[,] GetStringedBoard()
+        private void CheckForWinner()
         {
-            var board = new string[8, 8];
-            Point position;
-            foreach (var piece in pieces)
-            {
-                position = piece.Position;
-                board[position.X, position.Y] = GetCasedName(piece);
-            }
-
-            return board;
+            //count amount of moves, not pieces available
+            //if (legalPieceMoves. == 0)
+            //{
+            //    //if king under check we have a winner,
+            //    //otherwise stalemate
+            //}
         }
 
-        public int MovesCounter => movesCounter;
-
-        public Dictionary<Piece, List<Point>> GetMoves(bool isWhite)
+        private void UpdateStatus()
         {
-            var listOfThreats = new List<Point>();
-            var enemyThreats = isWhite ? listOfThreatsBlack : listOfThreatsWhite;
-            
-            moves = new Dictionary<Piece, List<Point>>();
-            List<Piece> kings = new List<Piece>();
-
-            foreach (var piece in pieces)
-            {
-                //check king moves as last thing (check for checks)
-                if (piece is King)
-                {
-                    kings.Add(piece);
-                    continue;
-                }
-                moves.Add(piece, piece.GetLegalMoves());
-                listOfThreats.AddRange(piece.GetCoveredSquares());
-            }
-            foreach (var piece in kings)
-            {
-                moves.Add(piece, ((King)piece).GetKingMoves(this, enemyThreats));
-                listOfThreats.AddRange(piece.GetCoveredSquares());
-            }
-
-            if (isWhite)
-            {
-                listOfThreatsWhite = new List<Point>(listOfThreats);
-            }
-            else
-            {
-                listOfThreatsBlack = new List<Point>(listOfThreats);
-            }
-
-            Dictionary<Piece, List<Point>> retArray = new Dictionary<Piece, List<Point>>();
-            foreach (var move in moves)
-            {
-                if (move.Key.IsWhite == isWhite)
-                {
-                    retArray.Add(move.Key, move.Value);
-                }
-            }
-
-            return retArray;
-        }
-
-        public double EvaluateBoard()
-        {
-            var score = 0.0;
-
-            foreach (var piece in pieces)
-            {
-                score += piece.Score;
-            }
-
-            return score;
-        }
-
-        /// <summary>
-        /// Check what is in place at the arriving position
-        /// </summary>
-        /// <param name="piece">piece getting moved</param>
-        /// <param name="arrivingPosition">arriving position to test</param>
-        /// <returns>Conflict type. What we find at arrival position</returns>
-        public static ConflictType CheckConflict(Piece piece, Point arrivingPosition)
-        {
-            var pieceInNextPosition = pieces.GetPieceByPosition(arrivingPosition);
-            if (pieceInNextPosition == null)
-            {
-                return ConflictType.None;
-            }
-
-            if ((piece.IsWhite && pieceInNextPosition.IsWhite) || (!piece.IsWhite && !pieceInNextPosition.IsWhite))
-            {
-                return ConflictType.Ally;
-            }
-
-            return ConflictType.Enemy;
+            movesCounter++;
+            isWhiteTurn = !isWhiteTurn;
         }
 
         /// <summary>
@@ -293,46 +245,6 @@ namespace ChessAI.Management
             //testsss
             pieces.Add(new Rook(false, new Point(5, 5))); //the anti castle
             //pieces.Add(new Pawn(true, new Point(4, 4)));
-        }
-
-        /// <summary>
-        /// Upper case for whites and lower case for blacks
-        /// </summary>
-        /// <param name="piece">Piece to get the name from</param>
-        /// <returns>Name of the piece distinguishing black and white</returns>
-        private string GetCasedName(Piece piece)
-        {
-            if (piece.IsWhite)
-            {
-                return piece.Name;
-            }
-            else
-            {
-                return piece.Name.ToLower();
-            }
-        }
-
-        private bool IsShortCastle(Piece king, Piece rook)
-        {
-            if (king is King
-                && rook is Rook
-                && king.Position.X == 4
-                && rook.Position.X == 7)
-            {
-                return true;
-            }
-            return false;
-        }
-        private bool IsLongCastle(Piece king, Piece rook)
-        {
-            if (king is King
-                && rook is Rook
-                && king.Position.X == 4
-                && rook.Position.X == 0)
-            {
-                return true;
-            }
-            return false;
         }
     }
 }
