@@ -46,26 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Management\Board.cs" />
-    <Compile Include="Common\Enums.cs" />
-    <Compile Include="Common\GettersLinq.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Common\EnsureState.cs" />
-    <Compile Include="Management\InterfaceData.cs" />
-    <Compile Include="Common\Messages.cs" />
-    <Compile Include="Management\PiecesMoves.cs" />
-    <Compile Include="Pieces\Queen.cs" />
-    <Compile Include="Pieces\Knight.cs" />
-    <Compile Include="Pieces\Pawn.cs" />
-    <Compile Include="Pieces\Bishop.cs" />
-    <Compile Include="Pieces\Piece.cs" />
-    <Compile Include="Pieces\King.cs" />
-    <Compile Include="Pieces\Rook.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -92,6 +78,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{bf017765-2b6e-4b09-8992-71f10dadb9ce}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
