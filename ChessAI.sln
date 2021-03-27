@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessAi.Domain", "Domain\Ch
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessAi.Application.WebApi", "ChessAi.Application.WebApi\ChessAi.Application.WebApi.csproj", "{52C94974-ED31-4857-96C4-D15E050CB140}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAi.Application", "Application\ChessAi.Application.csproj", "{FA6E5746-F1B2-4E34-866A-AE52AB8BCDB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessAi.Application", "Application\ChessAi.Application.csproj", "{FA6E5746-F1B2-4E34-866A-AE52AB8BCDB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAi.ConsoleCaller", "ConsoleCaller\ChessAi.ConsoleCaller.csproj", "{1C98263E-1D52-488F-979B-8358AF94C9B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{FA6E5746-F1B2-4E34-866A-AE52AB8BCDB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA6E5746-F1B2-4E34-866A-AE52AB8BCDB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA6E5746-F1B2-4E34-866A-AE52AB8BCDB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C98263E-1D52-488F-979B-8358AF94C9B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C98263E-1D52-488F-979B-8358AF94C9B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C98263E-1D52-488F-979B-8358AF94C9B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C98263E-1D52-488F-979B-8358AF94C9B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

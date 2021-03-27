@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 
-namespace ChessAI.Domain
+namespace ChessAI
 {
     public partial class Form1 : Form
     {

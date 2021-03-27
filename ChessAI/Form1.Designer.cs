@@ -1,5 +1,5 @@
 ﻿
-namespace ChessAI.Domain
+namespace ChessAI
 {
     partial class Form1
     {

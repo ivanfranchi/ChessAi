@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ChessAi.Domain.Pieces.Queries;
+﻿using ChessAi.Domain.Pieces.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ChessAi.Application.WebApi.Controllers
 {
@@ -19,6 +16,7 @@ namespace ChessAi.Application.WebApi.Controllers
             return new JsonResult(value);
         }
 
+        private static MovesController _movesController;
         private readonly ILogger<MovesController> _logger;
         private readonly IMediator _mediator;
 
@@ -28,6 +26,16 @@ namespace ChessAi.Application.WebApi.Controllers
         {
             _logger = logger;
             _mediator = mediator;
+            _movesController = this;
+        }
+
+        public static MovesController GetInstance()
+        {
+            if (_movesController == null)
+            {
+                _movesController = new MovesController(default, default);
+            }
+            return _movesController;
         }
 
         [HttpGet("fen")]
