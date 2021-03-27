@@ -9,35 +9,42 @@ namespace ChessAi.Domain.Common
             var rows = InterfaceData.GetPiecedBoard(Board.GetBoard().pieces);
             var output = "";
             
-            var rowIndex = 0;
+            var rowIndex = 8;
 
-            for (int i = 0; i < 8; i++)
+            for (int i = 7; i >= 0; i--)
             {
-                rowIndex++;
+                rowIndex--;
                 var blankSpaces = 0;
+                var pieceInRow = false;
 
                 for (int j = 0; j < 8; j++)
                 {
-                    var piece = rows[i, j];
+                    var piece = rows[j, i];
                     if (piece == null)
                     {
                         blankSpaces++;
                     }
                     else
                     {
-                        output += blankSpaces == 0
-                            ? piece.Name
-                            : string.Format("{0}{1}", blankSpaces, piece.Name);
-                        blankSpaces = 0;
-                    }
-
-                    if (blankSpaces > 0)
-                    {
-                        output += blankSpaces;
+                        pieceInRow = true;
+                        if (blankSpaces == 0)
+                        {
+                            output += piece.Name;
+                        }
+                        else
+                        {
+                            output += string.Format("{0}{1}", blankSpaces, piece.Name);
+                            blankSpaces = 0;
+                        }
                     }
                 }
 
-                if (rowIndex != 8)
+                if (!pieceInRow)
+                {
+                    output += blankSpaces;
+                }
+
+                if (rowIndex != 0)
                 {
                     output += "/";
                 }

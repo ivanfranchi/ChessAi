@@ -11,7 +11,7 @@ namespace ChessAI.Domain.Pieces
             Point position)
         {
             IsWhite = isWhite;
-            Name = name;
+            Name = isWhite ? name : name.ToLower();
             Position = position;
 
             GiveScore(name);

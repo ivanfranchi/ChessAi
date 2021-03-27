@@ -222,8 +222,8 @@ namespace ChessAI.Domain.Management
             pieces.Add(new Bishop(true, new Point(2, 0)));
             pieces.Add(new Queen(true, new Point(3, 0)));
             pieces.Add(new King(true, new Point(4, 0)));
-            //pieces.Add(new Bishop(true, new Point(5, 0)));
-            //pieces.Add(new Knight(true, new Point(6, 0)));
+            pieces.Add(new Bishop(true, new Point(5, 0)));
+            pieces.Add(new Knight(true, new Point(6, 0)));
             pieces.Add(new Rook(true, new Point(7, 0)));
 
             pieces.Add(new Pawn(true, new Point(0, 1)));
@@ -231,8 +231,8 @@ namespace ChessAI.Domain.Management
             pieces.Add(new Pawn(true, new Point(2, 1)));
             pieces.Add(new Pawn(true, new Point(3, 1)));
             pieces.Add(new Pawn(true, new Point(4, 1)));
-            //pieces.Add(new Pawn(true, new Point(5, 1)));
-            //pieces.Add(new Pawn(true, new Point(6, 1)));
+            pieces.Add(new Pawn(true, new Point(5, 1)));
+            pieces.Add(new Pawn(true, new Point(6, 1)));
             pieces.Add(new Pawn(true, new Point(7, 1)));
 
             //blacks
@@ -255,7 +255,7 @@ namespace ChessAI.Domain.Management
             pieces.Add(new Pawn(false, new Point(7, 6)));
 
             //testsss
-            pieces.Add(new Rook(false, new Point(5, 5))); //the anti castle
+            //pieces.Add(new Rook(false, new Point(5, 5))); //the anti castle
             //pieces.Add(new Pawn(true, new Point(4, 4)));
         }
     }
