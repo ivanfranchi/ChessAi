@@ -1,9 +1,9 @@
-﻿using ChessAI.Pieces;
+﻿using ChessAI.Domain.Pieces;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace ChessAI.Common
+namespace ChessAI.Domain.Common
 {
     public static class GettersLinq
     {

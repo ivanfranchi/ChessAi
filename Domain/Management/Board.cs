@@ -1,19 +1,31 @@
-﻿using ChessAI.Common;
-using ChessAI.Pieces;
+﻿using ChessAi.Domain.Pieces;
+using ChessAI.Domain.Common;
+using ChessAI.Domain.Pieces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace ChessAI.Management
+namespace ChessAI.Domain.Management
 {
     public class Board
     {
+        static Board _board = null;
         public bool isWhiteTurn = true;
-        static List<Piece> pieces;
+        public List<Piece> pieces;
         int movesCounter = 0;
         Dictionary<Piece, List<Point>> legalPiecesMoves = new Dictionary<Piece, List<Point>>();
         Dictionary<Piece, List<Point>> pastMoves; //history management
+
+        public static Board GetBoard()
+        {
+            if (_board == null)
+            {
+                _board = new Board();
+            }
+            return _board;
+        }
+
         IEnumerable<Point> enemyThreats = new List<Point>();
 
         public Board()
@@ -121,7 +133,7 @@ namespace ChessAI.Management
 
         public static ConflictType CheckConflict(Piece piece, Point arrivingPosition)
         {
-            return PiecesMoves.CheckConflict(pieces, piece, arrivingPosition);
+            return PiecesMoves.CheckConflict(GetBoard().pieces, piece, arrivingPosition);
         }
 
         private void SetEnemyThreats(bool isTurnWhite)

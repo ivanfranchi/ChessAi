@@ -1,7 +1,7 @@
-﻿using ChessAI.Pieces;
+﻿using ChessAI.Domain.Pieces;
 using System.Drawing;
 
-namespace ChessAI.Common
+namespace ChessAI.Domain.Common
 {
     public static class EnsureState
     {

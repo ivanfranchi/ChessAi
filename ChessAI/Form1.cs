@@ -1,12 +1,12 @@
-﻿using ChessAI.Management;
-using ChessAI.Pieces;
+﻿using ChessAI.Domain.Management;
+using ChessAI.Domain.Pieces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 
-namespace ChessAI
+namespace ChessAI.Domain
 {
     public partial class Form1 : Form
     {
@@ -20,7 +20,7 @@ namespace ChessAI
 
             rnd = new Random(DateTime.Now.Millisecond);    
 
-            board = new Board();
+            board = Board.GetBoard();
             UpdateStringedBoard();
             UpdateScore();
         }

@@ -1,13 +1,13 @@
-﻿using ChessAI.Pieces;
+﻿using ChessAI.Domain.Pieces;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace ChessAI.Management
+namespace ChessAI.Domain.Management
 {
     public class InterfaceData
     {
         /// <summary>
-        /// Get a string representation of the board
+        /// Get a string representation of the board as matrix
         /// </summary>
         /// <returns>8*8 string matrix of the board</returns>
         public static string[,] GetStringedBoard(List<Piece> pieces)
@@ -18,6 +18,23 @@ namespace ChessAI.Management
             {
                 position = piece.Position;
                 board[position.X, position.Y] = GetCasedName(piece);
+            }
+
+            return board;
+        }
+
+        /// <summary>
+        /// Get a representation of the board as matrix of pieces
+        /// </summary>
+        /// <returns>8*8 pieces matrix of the board</returns>
+        public static Piece[,] GetPiecedBoard(List<Piece> pieces)
+        {
+            var board = new Piece[8, 8];
+            Point position;
+            foreach (var piece in pieces)
+            {
+                position = piece.Position;
+                board[position.X, position.Y] = piece;
             }
 
             return board;

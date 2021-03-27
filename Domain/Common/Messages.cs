@@ -1,4 +1,4 @@
-﻿namespace ChessAI.Common
+﻿namespace ChessAI.Domain.Common
 {
     public static class Messages
     {

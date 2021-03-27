@@ -9,7 +9,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MediatR;
 using System.Threading.Tasks;
+using System.Reflection;
+using ChessAi.Domain.Pieces.Queries;
+using ChessAi.Application.QueryHandlers;
 
 namespace ChessAi.Application.WebApi
 {
@@ -26,6 +30,15 @@ namespace ChessAi.Application.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            
+            services.AddTransient<IRequestHandler<GetFenBoard, string>>(sp =>
+            {
+                return new GetFenBoardHandler();
+            });
+
+            //services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddMediatR(typeof(GetFenBoard).GetTypeInfo().Assembly);
+            //services.AddMediatR(new[] { typeof(GetFenBoard).GetType().Assembly, typeof(GetFenBoardHandler).GetType().Assembly });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

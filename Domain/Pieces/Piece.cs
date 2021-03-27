@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 
-namespace ChessAI.Pieces
+namespace ChessAI.Domain.Pieces
 {
     public abstract class Piece
     {

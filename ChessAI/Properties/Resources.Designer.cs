@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 
-namespace ChessAI.Properties
+namespace ChessAI.Domain.Properties
 {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.

@@ -1,9 +1,9 @@
-﻿using ChessAI.Common;
-using ChessAI.Management;
+﻿using ChessAI.Domain.Common;
+using ChessAI.Domain.Management;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace ChessAI.Pieces
+namespace ChessAI.Domain.Pieces
 {
     public class Pawn : Piece
     {

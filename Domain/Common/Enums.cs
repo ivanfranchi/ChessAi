@@ -1,4 +1,4 @@
-﻿namespace ChessAI.Common
+﻿namespace ChessAI.Domain.Common
 {
     /// <summary>
     /// Given a coordinate we might have these kind of pieces in place

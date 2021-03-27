@@ -1,13 +1,10 @@
-﻿using ChessAI.Common;
-using ChessAI.Pieces;
-using System;
+﻿using ChessAI.Domain.Common;
+using ChessAI.Domain.Pieces;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ChessAI.Management
+namespace ChessAI.Domain.Management
 {
     /// <summary>
     /// Evaluate moves

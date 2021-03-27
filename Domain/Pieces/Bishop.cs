@@ -1,9 +1,10 @@
-﻿using ChessAI.Common;
-using ChessAI.Management;
+﻿using ChessAI.Domain.Common;
+using ChessAI.Domain.Management;
+using ChessAI.Domain.Pieces;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace ChessAI.Pieces
+namespace ChessAi.Domain.Pieces
 {
     public class Bishop : Piece
     {
@@ -57,7 +58,7 @@ namespace ChessAI.Pieces
         /// <param name="incrementY">direction of search</param>
         /// <param name="currentPosition">current position from where to check the next position</param>
         private void GetMovesForDirection(
-            ref List<Point> list, 
+            ref List<Point> list,
             int incrementX,
             int incrementY,
             Point currentPosition,
