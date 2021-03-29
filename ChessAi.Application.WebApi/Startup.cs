@@ -36,8 +36,8 @@ namespace ChessAi.Application.WebApi
                 return new GetFenBoardHandler();
             });
 
-            //services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddMediatR(typeof(GetFenBoard).GetTypeInfo().Assembly);
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            //services.AddMediatR(typeof(GetFenBoard).GetTypeInfo().Assembly);
             //services.AddMediatR(new[] { typeof(GetFenBoard).GetType().Assembly, typeof(GetFenBoardHandler).GetType().Assembly });
         }
 

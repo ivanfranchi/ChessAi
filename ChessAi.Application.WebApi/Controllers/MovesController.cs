@@ -16,7 +16,6 @@ namespace ChessAi.Application.WebApi.Controllers
             return new JsonResult(value);
         }
 
-        private static MovesController _movesController;
         private readonly ILogger<MovesController> _logger;
         private readonly IMediator _mediator;
 
@@ -26,21 +25,12 @@ namespace ChessAi.Application.WebApi.Controllers
         {
             _logger = logger;
             _mediator = mediator;
-            _movesController = this;
-        }
-
-        public static MovesController GetInstance()
-        {
-            if (_movesController == null)
-            {
-                _movesController = new MovesController(default, default);
-            }
-            return _movesController;
         }
 
         [HttpGet("fen")]
         public Task<string> GetMoves(CancellationToken cancellationToken)
         {
+            _logger.LogDebug("Called GetMoves");
             var query = new GetFenBoard();
             return _mediator.Send(query, cancellationToken);
         }

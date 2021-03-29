@@ -1,26 +1,39 @@
-﻿using ChessAi.Application.WebApi.Controllers;
+﻿using ChessAi.ConsoleCaller.HttpGate;
 using System;
 
 namespace ChessAi.ConsoleCaller
 {
     class Program
     {
+        static RequestManager _requestManager;
+
         [STAThread]
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            GetMeth();
-            Console.ReadKey();
+            _requestManager = new RequestManager();
+
+            var s = "";
+            while (s != "q")
+            {
+                GetMethod(_requestManager);
+                s = Console.ReadLine();
+            }
         }
 
-        async static void GetMeth()
+        static void GetMethod(RequestManager rm)
         {
-            var controller = MovesController.GetInstance();
+            try
+            {
+                var xx = rm.SendGETRequest("https://localhost:44336/moves/fen", "", "", false);
 
-            var xx = await controller.GetMoves(default);
 
-
-            Console.WriteLine("got giuis");
+                Console.WriteLine("got giuis");
+            }
+            catch
+            {
+                
+            }
         }
     }
 }
